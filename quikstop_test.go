@@ -5,18 +5,37 @@ import (
 	"testing"
 )
 
-func TestEnvString(t *testing.T) {
+func TestGetEnv(t *testing.T) {
 	// 1. Fallback to default when unset
 	os.Unsetenv("TEST_ENV_VAR")
-	if val := EnvString("TEST_ENV_VAR", "default"); val != "default" {
+	if val := GetEnv("TEST_ENV_VAR", "default"); val != "default" {
 		t.Errorf("Expected 'default', got %s", val)
 	}
 
 	// 2. Read value when set
 	os.Setenv("TEST_ENV_VAR", "custom")
 	defer os.Unsetenv("TEST_ENV_VAR")
-	if val := EnvString("TEST_ENV_VAR", "default"); val != "custom" {
+	if val := GetEnv("TEST_ENV_VAR", "default"); val != "custom" {
 		t.Errorf("Expected 'custom', got %s", val)
+	}
+}
+
+func TestReqEnv(t *testing.T) {
+	// 1. Error when unset
+	os.Unsetenv("TEST_REQ_VAR")
+	if _, err := ReqEnv("TEST_REQ_VAR"); err == nil {
+		t.Error("Expected error for empty required env var")
+	}
+
+	// 2. Value when set
+	os.Setenv("TEST_REQ_VAR", "present")
+	defer os.Unsetenv("TEST_REQ_VAR")
+	val, err := ReqEnv("TEST_REQ_VAR")
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if val != "present" {
+		t.Errorf("Expected 'present', got %s", val)
 	}
 }
 
