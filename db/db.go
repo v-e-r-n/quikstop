@@ -3,7 +3,10 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"io/fs"
 	"strings"
+
+	"github.com/pressly/goose/v3"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "modernc.org/sqlite"
@@ -13,6 +16,7 @@ import (
 type DB struct {
 	*sql.DB
 	Binder
+	dialect Dialect
 }
 
 // Connect opens a connection pool to the database. It automatically infers the database
@@ -68,7 +72,27 @@ func Connect(connStr string) (*DB, error) {
 	}
 
 	return &DB{
-		DB:     dbConn,
-		Binder: newBinder(dialect),
+		DB:      dbConn,
+		Binder:  newBinder(dialect),
+		dialect: dialect,
 	}, nil
+}
+
+// Migrate runs database migrations using the provided embedded file system and target folder.
+func (d *DB) Migrate(embedFS fs.FS, dir string) error {
+	dialectName := "sqlite3"
+	if d.dialect == DialectPostgres {
+		dialectName = "postgres"
+	}
+
+	goose.SetBaseFS(embedFS)
+	if err := goose.SetDialect(dialectName); err != nil {
+		return fmt.Errorf("failed to set goose dialect: %w", err)
+	}
+
+	if err := goose.Up(d.DB, dir); err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+
+	return nil
 }
