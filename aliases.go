@@ -4,12 +4,19 @@ import (
 	"github.com/v-e-r-n/quikstop/cors"
 	"github.com/v-e-r-n/quikstop/db"
 	"github.com/v-e-r-n/quikstop/events"
+	"github.com/v-e-r-n/quikstop/haiku"
 	"github.com/v-e-r-n/quikstop/httputil"
 	"github.com/v-e-r-n/quikstop/jwt"
 	"github.com/v-e-r-n/quikstop/limiter"
 	"github.com/v-e-r-n/quikstop/mcfeely"
 	"github.com/v-e-r-n/quikstop/otp"
 )
+
+// -----------------------------------------------------------------------------
+// Haiku (quikstop/haiku)
+// -----------------------------------------------------------------------------
+
+var Haiku = haiku.Generate
 
 // -----------------------------------------------------------------------------
 // Database (quikstop/db)
