@@ -2,7 +2,8 @@ package otp
 
 import (
 	"context"
-	"log"
+
+	"github.com/v-e-r-n/quikstop/core"
 )
 
 // Deliverer defines the interface for sending verification codes to users.
@@ -10,20 +11,19 @@ type Deliverer interface {
 	Deliver(ctx context.Context, recipient string, code string) error
 }
 
-// consoleDeliverer prints the code to standard output. Useful for development.
-type consoleDeliverer struct {
-	logger *log.Logger
-}
+// consoleDeliverer prints the code using the active logger. Useful for development.
+type consoleDeliverer struct{}
 
-// NewConsoleDeliverer creates a Deliverer that logs to stdout.
-func NewConsoleDeliverer(logger *log.Logger) Deliverer {
-	if logger == nil {
-		logger = log.Default()
-	}
-	return &consoleDeliverer{logger: logger}
+// NewConsoleDeliverer creates a Deliverer that logs using the core active logger.
+func NewConsoleDeliverer() Deliverer {
+	return &consoleDeliverer{}
 }
 
 func (d *consoleDeliverer) Deliver(ctx context.Context, recipient string, code string) error {
-	d.logger.Printf("[otp] Deliver code %s to %s", code, recipient)
+	core.Logger().Info("Deliver verification code",
+		"component", "otp",
+		"recipient", recipient,
+		"code", code,
+	)
 	return nil
 }

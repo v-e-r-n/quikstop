@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"sync"
+
+	"github.com/v-e-r-n/quikstop/core"
 )
 
 // Dispatcher coordinates event fanning out to resolved active clients.
@@ -43,6 +45,11 @@ func (d *Dispatcher) Start(ctx context.Context) {
 				// 1. Resolve targeted clients
 				clientIDs, err := d.resolver.ResolveClientIDs(ctx, ev)
 				if err != nil {
+					core.Logger().Warn("Failed to resolve event recipients",
+						"component", "events",
+						"error", err,
+						"type", ev.Type,
+					)
 					continue
 				}
 
@@ -53,6 +60,11 @@ func (d *Dispatcher) Start(ctx context.Context) {
 				// 2. Marshal to JSON once for all recipients
 				data, err := json.Marshal(ev)
 				if err != nil {
+					core.Logger().Error("Failed to marshal event payload",
+						"component", "events",
+						"error", err,
+						"type", ev.Type,
+					)
 					continue
 				}
 
