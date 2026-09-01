@@ -11,13 +11,13 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type contextKey string
+type ContextKey string
 
 const (
 	// UserIDContextKey is the default context key under which user ID string is stored.
-	UserIDContextKey contextKey = "user_id"
+	UserIDContextKey ContextKey = "user_id"
 	// ScopeIDContextKey is the context key under which an optional scope/org/squad ID is stored.
-	ScopeIDContextKey contextKey = "scope_id"
+	ScopeIDContextKey ContextKey = "scope_id"
 )
 
 var (

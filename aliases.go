@@ -58,19 +58,25 @@ var (
 
 type JWTClaims = jwt.Claims
 type JWTMiddlewareOption = jwt.MiddlewareOption
+type JWTContextKey = jwt.ContextKey
+
+const (
+	UserIDContextKey  = jwt.UserIDContextKey
+	ScopeIDContextKey = jwt.ScopeIDContextKey
+)
 
 var (
 	ErrInvalidJWTToken = jwt.ErrInvalidToken
 	ErrMissingJWTToken = jwt.ErrMissingToken
 
-	GenerateJWT         = jwt.Generate
-	VerifyJWT           = jwt.Verify
-	AuthMiddleware      = jwt.Middleware
-	WithScopeHeaders    = jwt.WithScopeHeaders
+	GenerateJWT          = jwt.Generate
+	VerifyJWT            = jwt.Verify
+	AuthMiddleware       = jwt.Middleware
+	WithScopeHeaders     = jwt.WithScopeHeaders
 	WithScopeQueryParams = jwt.WithScopeQueryParams
-	WithoutQueryToken   = jwt.WithoutQueryToken
-	UserIDFromContext   = jwt.UserIDFromContext
-	ScopeIDFromContext  = jwt.ScopeIDFromContext
+	WithoutQueryToken    = jwt.WithoutQueryToken
+	UserIDFromContext    = jwt.UserIDFromContext
+	ScopeIDFromContext   = jwt.ScopeIDFromContext
 )
 
 // -----------------------------------------------------------------------------
