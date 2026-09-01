@@ -27,12 +27,13 @@ var (
 
 // Claims represents the standard JWT claims model.
 type Claims struct {
-	UserID  string `json:"sub"`
-	ScopeID string `json:"scope_id,omitempty"`
+	UserID    string `json:"sub"`
+	ScopeID   string `json:"scope_id,omitempty"`
+	TokenType string `json:"type,omitempty"`
 	jwt.RegisteredClaims
 }
 
-// Generate issues a signed HS256 JWT token for the given user ID.
+// Generate issues a signed HS256 JWT access token for the given user ID.
 func Generate(userID string, secret []byte, ttl time.Duration, scopeID ...string) (string, error) {
 	claims := Claims{
 		UserID: userID,
@@ -48,6 +49,23 @@ func Generate(userID string, secret []byte, ttl time.Duration, scopeID ...string
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(secret)
+}
+
+// GenerateRefreshToken issues a signed HS256 JWT refresh token.
+func GenerateRefreshToken(userID string, secret []byte, ttl time.Duration) (string, time.Time, error) {
+	expiresAt := time.Now().Add(ttl)
+	claims := Claims{
+		UserID:    userID,
+		TokenType: "refresh",
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   userID,
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signed, err := token.SignedString(secret)
+	return signed, expiresAt, err
 }
 
 // Verify parses and verifies a JWT token string against the given HMAC secret.
@@ -66,6 +84,21 @@ func Verify(tokenStr string, secret []byte) (*Claims, error) {
 		return claims, nil
 	}
 	return nil, ErrInvalidToken
+}
+
+// VerifyRefreshToken validates that the token is valid, unexpired, and has type "refresh".
+func VerifyRefreshToken(tokenStr string, secret []byte) (string, error) {
+	claims, err := Verify(tokenStr, secret)
+	if err != nil {
+		return "", errors.New("invalid refresh token")
+	}
+	if claims.TokenType != "refresh" {
+		return "", errors.New("not a refresh token")
+	}
+	if claims.UserID == "" {
+		return "", errors.New("invalid refresh token: missing user id")
+	}
+	return claims.UserID, nil
 }
 
 // MiddlewareOption configures the Auth middleware.

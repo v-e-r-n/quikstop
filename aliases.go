@@ -69,14 +69,16 @@ var (
 	ErrInvalidJWTToken = jwt.ErrInvalidToken
 	ErrMissingJWTToken = jwt.ErrMissingToken
 
-	GenerateJWT          = jwt.Generate
-	VerifyJWT            = jwt.Verify
-	AuthMiddleware       = jwt.Middleware
-	WithScopeHeaders     = jwt.WithScopeHeaders
-	WithScopeQueryParams = jwt.WithScopeQueryParams
-	WithoutQueryToken    = jwt.WithoutQueryToken
-	UserIDFromContext    = jwt.UserIDFromContext
-	ScopeIDFromContext   = jwt.ScopeIDFromContext
+	GenerateJWT             = jwt.Generate
+	GenerateJWTRefreshToken = jwt.GenerateRefreshToken
+	VerifyJWT               = jwt.Verify
+	VerifyJWTRefreshToken   = jwt.VerifyRefreshToken
+	AuthMiddleware          = jwt.Middleware
+	WithScopeHeaders        = jwt.WithScopeHeaders
+	WithScopeQueryParams    = jwt.WithScopeQueryParams
+	WithoutQueryToken       = jwt.WithoutQueryToken
+	UserIDFromContext       = jwt.UserIDFromContext
+	ScopeIDFromContext      = jwt.ScopeIDFromContext
 )
 
 // -----------------------------------------------------------------------------

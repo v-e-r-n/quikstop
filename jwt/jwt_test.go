@@ -96,3 +96,29 @@ func TestMiddleware(t *testing.T) {
 		t.Errorf("Expected status 401 Unauthorized, got: %d", rec3.Code)
 	}
 }
+
+func TestRefreshTokens(t *testing.T) {
+	token, expiresAt, err := jwt.GenerateRefreshToken("user-refresh-123", testSecret, 30*24*time.Hour)
+	if err != nil {
+		t.Fatalf("GenerateRefreshToken failed: %v", err)
+	}
+	if expiresAt.Before(time.Now()) {
+		t.Error("Expected future expiresAt")
+	}
+
+	userID, err := jwt.VerifyRefreshToken(token, testSecret)
+	if err != nil {
+		t.Fatalf("VerifyRefreshToken failed: %v", err)
+	}
+	if userID != "user-refresh-123" {
+		t.Errorf("Expected user-refresh-123, got: %s", userID)
+	}
+
+	// Access token should fail refresh token verification
+	accessToken, _ := jwt.Generate("user-refresh-123", testSecret, 1*time.Hour)
+	_, err = jwt.VerifyRefreshToken(accessToken, testSecret)
+	if err == nil {
+		t.Error("Expected error when verifying access token as refresh token")
+	}
+}
+
