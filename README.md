@@ -66,7 +66,8 @@ github.com/v-e-r-n/quikstop
   ├── jwt         # HS256 JWT generation, validation, and authentication middleware
   ├── limiter     # In-memory token-bucket IP rate limiting middleware with proxy IP parsing
   ├── mcfeely     # Transactional email delivery interface with Console and SMTP adapters
-  └── otp         # Passwordless one-time passcode (OTP) generation, verification & HTTP handler
+  ├── otp         # Passwordless one-time passcode (OTP) generation, verification & HTTP handler
+  └── rbac        # Zero-allocation, thread-safe Role-Based Access Control with mandatory finalization
 ```
 
 ---
@@ -258,6 +259,35 @@ func HandleUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	quikstop.JSON(w, http.StatusCreated, user)
+}
+```
+
+---
+
+## 10. Role-Based Access Control (`quikstop.NewRoleSet`)
+
+Zero-allocation, thread-safe RBAC engine with explicit permissions, role inheritance, wildcard matching, and mandatory finalization.
+
+```go
+// Define and finalize role sets at initialization
+var Roles = quikstop.NewRoleSet().
+	Define("guest", "view_board", "prioritize_backlog").
+	Define("member", "track_time", "manage_stories").Inherits("guest").
+	Define("admin", "delete_project", "manage_all").Inherits("member").
+	Finalize() // Must call Finalize() before evaluating
+
+// 1. Check permissions in services
+if !Roles.HasPermission(userRole, "track_time") {
+	return ErrForbidden
+}
+
+// 2. Generate frontend permission manifests
+permissionsList := Roles.PermissionsFor(userRole) // ["view_board", "prioritize_backlog", ...]
+
+// 3. Context integration
+ctx := quikstop.WithRole(r.Context(), "member")
+if !Roles.Can(ctx, "track_time") {
+	http.Error(w, "forbidden", http.StatusForbidden)
 }
 ```
 

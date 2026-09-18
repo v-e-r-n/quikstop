@@ -10,6 +10,7 @@ import (
 	"github.com/v-e-r-n/quikstop/limiter"
 	"github.com/v-e-r-n/quikstop/mcfeely"
 	"github.com/v-e-r-n/quikstop/otp"
+	"github.com/v-e-r-n/quikstop/rbac"
 )
 
 // -----------------------------------------------------------------------------
@@ -165,4 +166,22 @@ type SmtpMcFeely = mcfeely.SmtpMcFeely
 var (
 	NewConsoleMcFeely = mcfeely.NewConsoleMcFeely
 	NewSmtpMcFeely    = mcfeely.NewSmtpMcFeely
+)
+
+// -----------------------------------------------------------------------------
+// Role-Based Access Control (quikstop/rbac)
+// -----------------------------------------------------------------------------
+
+type RoleSet = rbac.RoleSet
+type Role = rbac.Role
+type RoleBuilder = rbac.RoleBuilder
+
+var (
+	ErrForbiddenRBAC    = rbac.ErrForbidden
+	ErrNotFinalized     = rbac.ErrNotFinalized
+	ErrAlreadyFinalized = rbac.ErrAlreadyFinalized
+
+	NewRoleSet          = rbac.NewRoleSet
+	WithRole            = rbac.WithRole
+	RoleFromContext     = rbac.RoleFromContext
 )
